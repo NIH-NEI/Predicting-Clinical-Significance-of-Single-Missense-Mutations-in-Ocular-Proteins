@@ -30,8 +30,34 @@ def grab_label(ef, aa):
         print(f"Mutation {aa} not found in the dataframe.")
         return None
 
-labels_train = {}
-unfold_fractions_train = {}
+# HBB - grab wt
+### Find this file on NEI Commons Website for Protein of Choice
+x_path = 'HBB_matrix.csv'
+xf = pd.read_csv(x_path)
+
+wt = ''
+
+def extract_fold(xf):
+    global wt
+    for index, row in xf.iterrows():
+        res = str(row.iloc[0])
+        res = res[0]
+        wt += res
+
+
+extract_fold(xf)
+wt = wt[1:]
+
+# grab HBB unfolding fractions for each residue for wt
+unfold_array_hbb = grab_uf(xf, wt)
+
+# initialize data dictionaries
+labels_train = {
+    "wt-hbb": 0
+}
+unfold_fractions_train = {
+    'wt-hbb': unfold_array_hbb
+}
 
 labels_test = {}
 unfold_fractions_test = {}
