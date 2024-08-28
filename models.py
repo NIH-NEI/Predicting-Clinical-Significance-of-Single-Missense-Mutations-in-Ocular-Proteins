@@ -1,3 +1,39 @@
+### MACHINE LEARNING ALGORITHMS
+rf_model = RandomForestClassifier(max_depth=None, min_samples_split=5, n_estimators=100, min_samples_leaf=1, class_weight=class_weights, random_state=42)
+rf_model.fit(X_train_s, y_train)
+
+xgb_model = xgb.XGBClassifier(max_depth=None, min_samples_split=5, min_samples_leaf=1, n_estimators=400, scale_pos_weight=class_weights[1], random_state=42, use_label_encoder=False)
+xgb_model.fit(X_train_s, y_train)
+
+dt_model = DecisionTreeClassifier(max_depth=None, min_samples_split=5, min_samples_leaf=1, class_weight=class_weights, random_state=42)
+dt_model.fit(X_train_s, y_train)
+
+svm_model = SVC(kernel='linear', C=1, probability=True, class_weight=class_weights, random_state=42)
+svm_model.fit(X_train_s, y_train)
+
+# For evaluation of each ML Algorithm:
+## replace svm with model of choice
+y_pred_svm = svm_model.predict(X_test_s)
+y_pred_proba_svm = svm_model.predict_proba(X_test_s)[:, 1]
+
+# Calculate metrics
+accuracy_svm = accuracy_score(y_test, y_pred_svm)
+precision_svm = precision_score(y_test, y_pred_svm)
+auc_svm = roc_auc_score(y_test, y_pred_proba_svm)
+recall_svm = recall_score(y_test, y_pred_svm)
+f1_svm = f1_score(y_test, y_pred_svm)
+report_svm = classification_report(y_test, y_pred_svm)
+
+# Print metrics
+print("SVM Accuracy:", accuracy_svm)
+print("SVM Precision:", precision_svm)
+print("SVM AUC:", auc_svm)
+print("SVM Recall:", recall_svm)
+print("SVM F1:", f1_svm)
+print("SVM Report:\n", report_svm)
+
+
+### NEURAL NETWORKS
 # DENSE MODEL
 dense_model = Sequential([
     Dense(128, input_shape=(586,), activation='relu'),
