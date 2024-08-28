@@ -119,3 +119,58 @@ for i in range(len(tdf)):
             print(f"Unexpected error: {e}")
     except Exception as e:
         print(f"Unexpected error: {e}")
+
+
+# FINAL DATA CURATION
+unfold_fractions_train_filtered = {k: v for k, v in unfold_fractions_train.items() if k not in unfold_fractions_test}
+labels_train_filtered = {k: v for k, v in labels_train.items() if k not in labels_test}
+
+sequence_data_train = {
+    "unfolding_fraction": []
+}
+for seq_id, uf in unfold_fractions_train_filtered.items():
+    sequence_data_train["unfolding_fraction"].append(uf)
+
+df_sequences_train = pd.DataFrame(sequence_data_train)
+
+sequence_data_test = {
+    "unfolding_fraction": []
+}
+for seq_id, uf in unfold_fractions_test.items():
+    sequence_data_test["unfolding_fraction"].append(uf)
+
+df_sequences_test = pd.DataFrame(sequence_data_test)
+
+unfolding_fractions_padded = []
+for i in df_sequences_train['unfolding_fraction']:
+    # change number based on max protein length
+    padded = np.zeros(586)
+    padded[:len(i)] = i
+    unfolding_fractions_padded.append(padded)
+
+unfolding_fractions_padded = []
+for i in df_sequences_test['unfolding_fraction']:
+    # change number based on max protein length
+    padded = np.zeros(586)
+    padded[:len(i)] = i
+    unfolding_fractions_padded.append(padded)
+
+unfolding_fractions_padded_test = np.array(unfolding_fractions_padded)
+unfolding_fractions_padded_train = np.array(unfolding_fractions_padded)
+
+X_train = unfolding_fractions_padded_train
+y_train = np.array(list(labels_train_filtered.values()), dtype=np.float32)
+
+X_test = unfolding_fractions_padded_test
+y_test = np.array(list(labels_test.values()), dtype=np.float32)
+
+# Standardize features by removing the mean and scaling to unit variance
+scaler = StandardScaler()
+X_train_s = scaler.fit_transform(X_train)
+X_test_s = scaler.transform(X_test)
+
+# Calculate class weights
+class_weights = compute_class_weight(class_weight='balanced', classes=np.unique(y_train), y=y_train)
+class_weights = dict(enumerate(class_weights))
+
+print(f"Class Weights: {class_weights}")
